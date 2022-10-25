@@ -4,15 +4,20 @@ import com.wang.xw_mall.pojo.Users;
 import com.wang.xw_mall.mapper.UserMapper;
 import com.wang.xw_mall.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.wang.xw_mall.utils.Base64Util;
 import com.wang.xw_mall.utils.MD5Util;
 import com.wang.xw_mall.vo.ResStatus;
 import com.wang.xw_mall.vo.ResultVo;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -83,10 +88,20 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, Users> implements 
             String md5Pwd = MD5Util.md5(password);
             // 使用加密后的密码 和 users 中的密码进行匹配
             if(users.getPassword().equals(md5Pwd)){
-                //验证成功
-
                 // 登录成功, 则需要生成 token 令牌传递给前端
-                String token = Base64Util.encode(name + "wangxiaowang");
+                // 使用 jwt 生成 token 令牌
+                JwtBuilder builder = Jwts.builder();
+
+                Map<String, Object > map = new HashMap<>();
+                map.put("key1","value1");
+                map.put("key2","value2");
+                String token = builder.setSubject(users.getNickname())
+                        .setIssuedAt(new Date()) // 设置 token 生成时间  -- 过期校验用
+                        .setId(users.getUserId() + "") // 设置用户id 为 token id
+                        .setClaims(map) // 自定义数据 -- payload
+                        .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * 7)) // token 过期时间
+                        .signWith(SignatureAlgorithm.HS256, "wangxiaowang") // 设置算法进行签名
+                        .compact();
 
                 users.setPassword(null);
 
