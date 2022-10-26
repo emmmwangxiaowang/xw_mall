@@ -1,5 +1,6 @@
 package com.wang.xw_mall.controller;
 
+import com.wang.xw_mall.service.ICategoryService;
 import com.wang.xw_mall.service.IIndexImgService;
 import com.wang.xw_mall.vo.ResultVo;
 import io.swagger.annotations.Api;
@@ -26,9 +27,18 @@ public class IndexController {
     @Resource
     IIndexImgService indexImgService;
 
+    @Resource
+    ICategoryService categoryService;
+
     @ApiOperation(value = "首页轮播图接口")
     @GetMapping("/index-img")
     public ResultVo getCarouselImg(){
         return indexImgService.getCarouselImg();
+    }
+
+    @ApiOperation(value = "类别查询")
+    @GetMapping("/category-list")
+    public ResultVo getCategories(){
+        return categoryService.queryAllCategories(0);
     }
 }
