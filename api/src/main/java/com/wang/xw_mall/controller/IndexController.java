@@ -37,7 +37,7 @@ public class IndexController {
     }
 
     @ApiOperation(value = "类别查询")
-    @GetMapping("/")
+    @GetMapping("/category-list")
     public ResultVo getCategories(){
         return categoryService.queryAllCategories(0);
     }
